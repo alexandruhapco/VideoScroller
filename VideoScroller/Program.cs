@@ -67,7 +67,8 @@ void ScrollVideo(int seconds)
 void TogglePlayPause() 
 {
     var isPaused = driver.FindElement(By.TagName("video")).GetDomProperty("paused") == "True";
-    if (isPaused) {
+    if (isPaused) 
+    {
         ExecuteJS($"{video}.play()");
     } 
     else 
@@ -87,9 +88,12 @@ void Prev() {
 
 void ExecuteJS(string js) 
 {
-    try {
+    try 
+    {
        var q = (string)((IJavaScriptExecutor)driver).ExecuteScript(js);
-    } catch (Exception) {
+    } 
+    catch (Exception) 
+    {
         Console.WriteLine($"Execute js failed: {js}");
     }
 }
