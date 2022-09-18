@@ -5,6 +5,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using SharpHook;
 
+const string url = "http://seasonvar.ru";
 const string video = "document.getElementsByTagName('video')[0]";
 const string xPathPrev = "//*[@id='oframehtmlPlayer']/pjsdiv[7]/pjsdiv[3]";
 const string xPathNext = "//*[@id='oframehtmlPlayer']/pjsdiv[8]/pjsdiv[3]";
@@ -38,14 +39,14 @@ void ActionOnPress(int keyCode)
         case 109: TogglePlayPause(); break;     // - numpad -
         case 104: Prev(); break;                // - numpad 8
         case 105: Next(); break;                // - numpad 9
-        default: Console.WriteLine(keyCode); break;
+        default: /*Console.WriteLine(keyCode);*/ break;
     };
 }
 
 void StartBrowser() 
 {
     driver = new ChromeDriver {
-        Url = "http://seasonvar.ru/?mod=login"
+        Url = $"{url}/?mod=login"
     };
 
     var loginFld = driver.FindElement(By.Name("login"));
@@ -56,7 +57,7 @@ void StartBrowser()
 
     passwordFld.Submit();
 
-    driver.Url = "http://seasonvar.ru/?mod=pause";
+    driver.Url = $"{url}/?mod=pause";
 }
 
 void ScrollVideo(int seconds) 
@@ -90,10 +91,10 @@ void ExecuteJS(string js)
 {
     try 
     {
-       var q = (string)((IJavaScriptExecutor)driver).ExecuteScript(js);
+       ((IJavaScriptExecutor)driver).ExecuteScript(js);
     } 
     catch (Exception) 
     {
-        Console.WriteLine($"Execute js failed: {js}");
+        Console.WriteLine($"{nameof(ExecuteJS)} failed: {js}");
     }
 }
