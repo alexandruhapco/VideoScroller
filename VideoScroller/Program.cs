@@ -9,6 +9,8 @@ const string url = "http://seasonvar.ru";
 const string video = "document.getElementsByTagName('video')[0]";
 const string xPathPrev = "//*[@id='oframehtmlPlayer']/pjsdiv[7]/pjsdiv[3]";
 const string xPathNext = "//*[@id='oframehtmlPlayer']/pjsdiv[8]/pjsdiv[3]";
+const string xPathFullScreen = "//*[@id='oframehtmlPlayer']/pjsdiv[15]/pjsdiv[4]";
+const string CurrentMomentClass = "svico-mwatch";
 
 using IHost host = Host.CreateDefaultBuilder(args).Build();
 IConfiguration config = host.Services.GetRequiredService<IConfiguration>();
@@ -39,6 +41,8 @@ void ActionOnPress(int keyCode)
         case 109: TogglePlayPause(); break;     // - numpad -
         case 104: Prev(); break;                // - numpad 8
         case 105: Next(); break;                // - numpad 9
+        case 101: ToggleFullScreen(); break;    // - numpad 5
+        case 102: SaveCurrentTime(); break;     // - numpad 5
         default: /*Console.WriteLine(keyCode);*/ break;
     };
 }
@@ -87,11 +91,21 @@ void Prev() {
     ExecuteJS($"document.evaluate(\"{xPathPrev}\", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click()");
 }
 
+void ToggleFullScreen() 
+{
+    ExecuteJS($"document.evaluate(\"{xPathFullScreen}\", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click()");
+}
+
+void SaveCurrentTime() 
+{
+    driver.FindElement(By.ClassName(CurrentMomentClass)).Click();
+}
+
 void ExecuteJS(string js) 
 {
     try 
     {
-       ((IJavaScriptExecutor)driver).ExecuteScript(js);
+        ((IJavaScriptExecutor)driver).ExecuteScript(js);
     } 
     catch (Exception) 
     {
