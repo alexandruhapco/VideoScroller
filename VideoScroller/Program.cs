@@ -72,6 +72,7 @@ void ScrollVideo(int seconds)
 void TogglePlayPause() 
 {
     var isPaused = driver.FindElement(By.TagName("video")).GetDomProperty("paused") == "True";
+
     if (isPaused) 
     {
         ExecuteJS($"{video}.play()");
@@ -84,21 +85,34 @@ void TogglePlayPause()
 
 void Next() 
 {
-    ExecuteJS($"document.evaluate(\"{xPathNext}\", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click()");
+    ClickNonClickableByXpath(xPathNext);
 }
 
-void Prev() {
-    ExecuteJS($"document.evaluate(\"{xPathPrev}\", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click()");
+void Prev() 
+{
+    ClickNonClickableByXpath(xPathPrev);
 }
 
 void ToggleFullScreen() 
 {
-    ExecuteJS($"document.evaluate(\"{xPathFullScreen}\", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click()");
+    ClickNonClickableByXpath(xPathFullScreen);
 }
 
 void SaveCurrentTime() 
 {
-    driver.FindElement(By.ClassName(CurrentMomentClass)).Click();
+    try 
+    {
+        driver.FindElement(By.ClassName(CurrentMomentClass)).Click();
+    } 
+    catch (Exception) 
+    {
+        Console.WriteLine($"{nameof(SaveCurrentTime)} failed");
+    }
+}
+
+void ClickNonClickableByXpath(string xPath) 
+{
+    ExecuteJS($"document.evaluate(\"{xPath}\", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click()");
 }
 
 void ExecuteJS(string js) 
