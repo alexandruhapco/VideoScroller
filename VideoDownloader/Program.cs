@@ -23,7 +23,7 @@ string password = config.GetValue<string>("Seasonvar:Password");
 
 app.MapGet("/open", () =>
 {
-    var scrapper = new SeasonvarScraper();
+    var scrapper = new SeasonvarScrapper();
     scrapper.StartBrowser();
     scrapper.Login(login, password);
 })

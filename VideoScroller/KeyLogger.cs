@@ -4,9 +4,9 @@ using SharpHook;
 namespace VideoScroller;
 public class KeyLogger
 {
-    private readonly SeasonvarScraper _scraper;
+    private readonly SeasonvarScrapper _scraper;
 
-    public KeyLogger(SeasonvarScraper scraper)
+    public KeyLogger(SeasonvarScrapper scraper)
     {
         _scraper = scraper;
     }

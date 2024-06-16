@@ -10,11 +10,15 @@ IConfiguration config = host.Services.GetRequiredService<IConfiguration>();
 string login = config.GetValue<string>("login");
 string password = config.GetValue<string>("password");
 
-var scrapper = new SeasonvarScraper();
+var scrapper = new SeasonvarScrapper();
+
 
 scrapper.StartBrowser();
-scrapper.Login(login, password);
+scrapper.Download("http://seasonvar.ru/serial-38721-Patcany-4-season.html");
 
-var keyLogger = new KeyLogger(scrapper);
-keyLogger.StartKeyLogger();
+//scrapper.StartBrowser();
+//scrapper.Login(login, password);
+
+//var keyLogger = new KeyLogger(scrapper);
+//keyLogger.StartKeyLogger();
 
