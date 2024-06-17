@@ -9,7 +9,9 @@ public class SeasonvarScrapper
     const string _url = "http://seasonvar.ru";
     const string _video = "document.getElementsByTagName('video')[0]";
     const string _xPathPrev = "//*[@id='oframehtmlPlayer']/pjsdiv[7]/pjsdiv[3]";
+    const string _xPathPrevCheck = "//*[@id='oframehtmlPlayer']/pjsdiv[7]";
     const string _xPathNext = "//*[@id='oframehtmlPlayer']/pjsdiv[8]/pjsdiv[3]";
+    const string _xPathNextCheck = "//*[@id='oframehtmlPlayer']/pjsdiv[8]";
     const string _xPathFullScreen = "//*[@id='oframehtmlPlayer']/pjsdiv[15]/pjsdiv[4]";
     const string _currentMomentClass = "svico-mwatch";
 
@@ -19,13 +21,22 @@ public class SeasonvarScrapper
 
     public async Task Download()
     {
-        for (int i = 0; i < 4; i++)
+        var urls = new HashSet<string>();
+        do
         {
             var videoUrl = GetVideoTagSrc();
+            urls.Add(videoUrl);
+        } while (Next());
+     
+        urls.Add(GetVideoTagSrc());
+
+        Driver.Close();
+
+        await Parallel.ForEachAsync(urls, async (videoUrl, ct) =>
+        {
             var name = videoUrl.Split("/").Last();
             await DownloadFile(videoUrl, $"F:\\test\\{name}");
-            Next();
-        }
+        });
     }
 
     private async Task DownloadFile(string url, string path)
@@ -37,11 +48,6 @@ public class SeasonvarScrapper
     public string GetVideoTagSrc()
     {
         return Driver.FindElement(By.TagName("video")).GetAttribute("src");
-    }
-
-    public void Download(string url, int episode)
-    {
-
     }
 
     public void StartBrowser(string url = null)
@@ -83,14 +89,18 @@ public class SeasonvarScrapper
         }
     }
 
-    public void Next()
+    public bool Next()
     {
         ClickNonClickableByXpath(_xPathNext);
+        var next = Driver.FindElement(By.XPath(_xPathNextCheck)).GetCssValue("opacity");
+        return next == "1";
     }
 
-    public void Prev()
+    public bool Prev()
     {
         ClickNonClickableByXpath(_xPathPrev);
+        var prev = Driver.FindElement(By.XPath(_xPathPrevCheck)).GetCssValue("opacity");
+        return prev == "1";
     }
 
     public void ToggleFullScreen()
