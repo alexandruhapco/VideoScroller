@@ -1,5 +1,6 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using System.Net;
 
 namespace Selenium.Helper;
 
@@ -16,52 +17,21 @@ public class SeasonvarScrapper
 
     public ChromeDriver Driver { get; set; }
 
-    public async Task Download(string url)
+    public async Task Download()
     {
-        Driver.Navigate().GoToUrl(url);
-        TogglePlayPause();
-        TogglePlayPause();
-        var videoUrl = GetVideoTagSrc();
-
-        await DownloadFile(videoUrl);
+        for (int i = 0; i < 4; i++)
+        {
+            var videoUrl = GetVideoTagSrc();
+            var name = videoUrl.Split("/").Last();
+            await DownloadFile(videoUrl, $"F:\\test\\{name}");
+            Next();
+        }
     }
 
-    private async Task DownloadFile(string url)
+    private async Task DownloadFile(string url, string path)
     {
-        var filePath = "qwe.mp4";
-        using var client = new HttpClient();
-        using var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
-        response.EnsureSuccessStatusCode();
-        var totalBytes = response.Content.Headers.ContentLength;
-        using Stream contentStream = await response.Content.ReadAsStreamAsync(), fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None, 8192, true);
-        var totalRead = 0L;
-        var buffer = new byte[8192];
-        var isMoreToRead = true;
-
-        do
-        {
-            var read = await contentStream.ReadAsync(buffer);
-            if (read == 0)
-            {
-                isMoreToRead = false;
-                Console.WriteLine("Download complete.");
-                continue;
-            }
-
-            await fileStream.WriteAsync(buffer.AsMemory(0, read));
-
-            totalRead += read;
-
-            if (totalBytes.HasValue)
-            {
-                Console.WriteLine($"Progress: {totalRead}/{totalBytes} ({(totalRead * 1d / totalBytes.Value * 100):0.00}%)");
-            }
-            else
-            {
-                Console.WriteLine($"Progress: {totalRead} bytes downloaded");
-            }
-        }
-        while (isMoreToRead);
+        using var client = new WebClient();
+        client.DownloadFile(url, path);
     }
 
     public string GetVideoTagSrc()
@@ -74,11 +44,11 @@ public class SeasonvarScrapper
 
     }
 
-    public void StartBrowser()
+    public void StartBrowser(string url = null)
     {
         Driver = new ChromeDriver
         {
-            Url = $"{_url}/?mod=login"
+            Url = url ?? $"{_url}/?mod=login"
         };
     }
 
@@ -107,8 +77,7 @@ public class SeasonvarScrapper
         if (isPaused)
         {
             ExecuteJS($"{_video}.play()");
-        }
-        else
+        } else
         {
             ExecuteJS($"{_video}.pause()");
         }

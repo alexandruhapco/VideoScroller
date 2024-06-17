@@ -17,17 +17,14 @@ if (app.Environment.IsDevelopment())
 }
 app.UseHttpsRedirection();
 
-IConfiguration config = app.Services.GetRequiredService<IConfiguration>();
-string login = config.GetValue<string>("Seasonvar:Login");
-string password = config.GetValue<string>("Seasonvar:Password");
-
-app.MapGet("/open", () =>
+app.MapGet("/download", async (string url) =>
 {
     var scrapper = new SeasonvarScrapper();
-    scrapper.StartBrowser();
-    scrapper.Login(login, password);
+
+    scrapper.StartBrowser(url);
+    await scrapper.Download();
 })
-.WithName("OpenSeasonvar")
+.WithName("Download")
 .WithOpenApi();
 
 app.Run();
