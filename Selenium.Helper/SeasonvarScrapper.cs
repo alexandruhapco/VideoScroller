@@ -19,7 +19,7 @@ public class SeasonvarScrapper
 
     public ChromeDriver Driver { get; set; }
 
-    public async Task Download()
+    public async Task Download(string path)
     {
         var urls = new HashSet<string>();
         do
@@ -32,10 +32,15 @@ public class SeasonvarScrapper
 
         Driver.Close();
 
-        await Parallel.ForEachAsync(urls, async (videoUrl, ct) =>
+        var options = new ParallelOptions()
+        {
+            MaxDegreeOfParallelism = 12
+        };
+
+        await Parallel.ForEachAsync(urls, options, async (videoUrl, ct) =>
         {
             var name = videoUrl.Split("/").Last();
-            await DownloadFile(videoUrl, $"F:\\test\\{name}");
+            await DownloadFile(videoUrl, $"{path}\\{name}");
         });
     }
 

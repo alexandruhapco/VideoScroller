@@ -2,12 +2,13 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Selenium.Helper;
+using System.Xml.Linq;
 using VideoScroller;
 
 var scrapper = new SeasonvarScrapper();
 
-scrapper.StartBrowser("http://seasonvar.ru/serial-36176-Devochka-holodil_nik_pslpeub.html");
-await scrapper.Download();
+scrapper.StartBrowser("http://seasonvar.ru/serial-4694--Mastera_mecha_onlajn.html");
+await scrapper.Download($"F:\\SAO");
 
 //using IHost host = Host.CreateDefaultBuilder(args).Build();
 //IConfiguration config = host.Services.GetRequiredService<IConfiguration>();
