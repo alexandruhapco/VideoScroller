@@ -1,5 +1,6 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Support.UI;
 using System.Net;
 
 namespace Selenium.Helper;
@@ -19,16 +20,30 @@ public class SeasonvarScrapper
 
     public ChromeDriver Driver { get; set; }
 
-    public async Task Download(string path)
+    public async Task Download(string path, string dubs = "", int count = 0)
     {
+        var i = 0;
+
         var urls = new HashSet<string>();
+
+        SwitchDub(dubs);
+
         do
         {
             var videoUrl = GetVideoTagSrc();
             urls.Add(videoUrl);
+            Console.WriteLine($"Url scrapped: {videoUrl}");
+
+            i++;
+            if (count != 0 && i >= count)
+            {
+                break;
+            }
         } while (Next());
-     
-        urls.Add(GetVideoTagSrc());
+
+        var lastVideoUrl = GetVideoTagSrc();
+        urls.Add(lastVideoUrl);
+        Console.WriteLine($"Url scrapped: {lastVideoUrl}");
 
         Driver.Close();
 
@@ -44,15 +59,54 @@ public class SeasonvarScrapper
         });
     }
 
+    private void SwitchDub(string dubs)
+    {
+        if (!string.IsNullOrEmpty(dubs))
+        {
+            Console.WriteLine($"Dub set started: {dubs}");
+            var videoUrl = GetVideoTagSrc();
+            SelectDub(dubs);
+            var dubVideoUrl = GetVideoTagSrc();
+            while (videoUrl == dubVideoUrl)
+            {
+                Thread.Sleep(500);
+                dubVideoUrl = GetVideoTagSrc();
+            }
+            Console.WriteLine($"Dub set done: {dubs}");
+        }
+    }
+
+    private void SelectDub(string dub)
+    {
+        var xPath = $"//ul[@class='pgs-trans']/li[text()='{dub}']";
+        var dubItem = Driver.FindElement(By.XPath(xPath));
+        dubItem.Click();
+    }
+
     private async Task DownloadFile(string url, string path)
     {
         using var client = new WebClient();
+        Directory.CreateDirectory(Path.GetDirectoryName(path));
+        Console.WriteLine($"Download started: {path}");
         client.DownloadFile(url, path);
+        Console.WriteLine($"Download finished: {path}");
     }
 
     public string GetVideoTagSrc()
     {
-        return Driver.FindElement(By.TagName("video")).GetAttribute("src");
+        var videoTag = "";
+        try
+        {
+            videoTag = Driver.FindElement(By.TagName("video")).GetAttribute("src");
+        }
+        catch (Exception)
+        {
+            var wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(10));
+            IWebElement videoElement = wait.Until(x => x.FindElement(By.TagName("video")));
+            videoTag = Driver.FindElement(By.TagName("video")).GetAttribute("src");
+        }
+
+        return videoTag;
     }
 
     public void StartBrowser(string url = null)
