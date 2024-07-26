@@ -6,10 +6,12 @@ using SSHClient;
 
 var scrapper = new SeasonvarScrapper();
 
-
-var folderName = "Dexter Season 5";
-var url = "http://seasonvar.ru/serial-1585--Dekster-_pstaszk-05-sezon.html";
-
+Console.WriteLine("Folder Name:");
+var folderName = Console.ReadLine()!;
+Console.WriteLine("Url:");
+var url = Console.ReadLine()!;
+Console.WriteLine("Number of episodes:");
+var numberOfEpisodes = int.Parse(Console.ReadLine()!);
 
 
 using IHost host = Host.CreateDefaultBuilder(args).Build();
@@ -19,17 +21,17 @@ var plexConfig = config.GetSection("Plex");
 var seasonvarConfig = config.GetSection("Seasonvar");
 var foldersConfig = config.GetSection("Folders");
 
-var localPath = Path.Combine(foldersConfig["LocalFolder"], folderName);
+var localPath = Path.Combine(foldersConfig["LocalFolder"]!, folderName!);
 var myPlexPath = $"{foldersConfig["PlexFolder"]}/{folderName}";
 
-//scrapper.StartBrowser(url);
-//await scrapper.Download(localPath, seasonvarConfig["Dubs"]);
+scrapper.StartBrowser(url);
+await scrapper.Download(localPath, seasonvarConfig["Dubs"]!, numberOfEpisodes);
 
 SshService.SendFolder(
-    plexConfig["Host"],
+    plexConfig["Host"]!,
     22,
-    plexConfig["Username"],
-    plexConfig["Password"],
+    plexConfig["Username"]!,
+    plexConfig["Password"]!,
     localPath,
     myPlexPath);
 

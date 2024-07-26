@@ -22,7 +22,7 @@ app.MapGet("/download", async (string url) =>
     var scrapper = new SeasonvarScrapper();
 
     scrapper.StartBrowser(url);
-    await scrapper.Download();
+  //  await scrapper.Download();
 })
 .WithName("Download")
 .WithOpenApi();

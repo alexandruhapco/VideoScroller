@@ -2,6 +2,7 @@
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using System.Net;
+using System.Text.RegularExpressions;
 
 namespace Selenium.Helper;
 
@@ -55,6 +56,10 @@ public class SeasonvarScrapper
         await Parallel.ForEachAsync(urls, options, async (videoUrl, ct) =>
         {
             var name = videoUrl.Split("/").Last();
+            var pattern = @"(S\d{2})(E\d{2})";
+            var replacement = "$1-$2";
+            name = Regex.Replace(name, pattern, replacement);
+
             await DownloadFile(videoUrl, $"{path}\\{name}");
         });
     }
